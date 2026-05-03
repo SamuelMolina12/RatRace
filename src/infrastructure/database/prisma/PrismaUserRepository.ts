@@ -1,5 +1,5 @@
 import { prisma } from "./prisma.client";
-import { CreateUserData, UserRepository } from "../../../domain/repositories/UserRepository";
+import { CreateUserData, UserRepository,UpdateUserProfileData } from "../../../domain/repositories/UserRepository";
 
 export class PrismaUserRepository implements UserRepository {
   findByEmail(email: string) {
@@ -21,8 +21,15 @@ export class PrismaUserRepository implements UserRepository {
   }
 
   findById(id: string) {
-  return prisma.user.findUnique({
-    where: { id }
-  });
-}
+    return prisma.user.findUnique({
+      where: { id }
+    });
+  }
+
+  updateProfile(id: string, data: UpdateUserProfileData) {
+    return prisma.user.update({
+      where: { id },
+      data
+    });
+  }
 }
