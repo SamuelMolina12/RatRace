@@ -6,7 +6,7 @@ interface RegisterInput {
   username: string;
   email: string;
   password: string;
-  profile_photo?: string;
+  profilePhoto?: string;
   zone?: {
     locality: string;
     city: string;
@@ -45,14 +45,14 @@ const user = await this.userRepository.create({
   username: normalizedUsername,
   email: normalizedEmail,
   passwordHash,
-  rango: "D",
-  victorias: 0,
-  derrotas: 0,
-  fotoPerfil: input.profile_photo,
-  zonaLocalidad: input.zone?.[0]?.locality,
-  zonaCiudad: input.zone?.[0]?.city,
-  zonaEstado: input.zone?.[0]?.state,
-  zonaPais: input.zone?.[0]?.country
+  rank: "D",
+  wins: 0,
+  losses: 0,
+  profilePhoto: input.profilePhoto,
+  locality: input.zone?.[0]?.locality,
+  city: input.zone?.[0]?.city,
+  state: input.zone?.[0]?.state,
+  country: input.zone?.[0]?.country
 });
 
     return {

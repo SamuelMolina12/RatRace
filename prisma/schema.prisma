@@ -7,20 +7,20 @@ datasource db {
 }
 
 model User {
-  id            String   @id @default(uuid())
-  username      String   @unique
-  email         String   @unique
-  passwordHash  String   @map("password_hash")
-  role          String   @default("PILOT")
-  rango         String   @default("D")
-  victorias     Int      @default(0)
-  derrotas      Int      @default(0)
-  fotoPerfil    String?  @map("foto_perfil")
-  zonaLocalidad String?  @map("zona_localidad")
-  zonaCiudad    String?  @map("zona_ciudad")
-  zonaEstado    String?  @map("zona_estado")
-  zonaPais      String?  @map("zona_pais")
-  createdAt     DateTime @default(now()) @map("created_at")
-  updatedAt     DateTime @updatedAt @map("updated_at")
+  id           String   @id @default(uuid())
+  username     String   @unique
+  email        String   @unique
+  passwordHash String
+  role         String   @default("PILOT")
+  rank         String   @default("D")
+  wins         Int      @default(0)
+  losses       Int      @default(0)
+  profilePhoto String?
+  locality     String?
+  city         String?
+  state        String?
+  country      String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
   @@map("users")
 }
