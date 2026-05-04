@@ -15,6 +15,7 @@ model User {
   rank         String   @default("D")
   wins         Int      @default(0)
   losses       Int      @default(0)
+  consecutiveWins Int @default(0)
   profilePhoto String?
   locality     String?
   city         String?

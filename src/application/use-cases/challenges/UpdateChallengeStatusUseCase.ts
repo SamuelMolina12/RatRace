@@ -1,6 +1,7 @@
 import { prisma } from "../../../infrastructure/database/prisma/prisma.client";
 import { CHALLENGE_STATUS } from "../../../shared/constants/challenge.constants";
 import { AppError } from "../../../shared/errors/AppError";
+import { RankingService } from "../../services/RankingService";
 
 export class UpdateChallengeStatusUseCase {
     async accept(challengeId: string, userId: string) {
@@ -133,6 +134,36 @@ export class UpdateChallengeStatusUseCase {
                 : challenge.challengerId;
 
         return prisma.$transaction(async (tx) => {
+            const winner = await tx.user.findUnique({
+                where: { id: winnerId },
+            });
+
+            const loser = await tx.user.findUnique({
+                where: { id: loserId },
+            });
+
+            if (!winner || !loser) {
+                throw new AppError("No se encontraron los pilotos del reto", 404);
+            }
+
+            const newWinnerConsecutiveWins = winner.consecutiveWins + 1;
+
+            const winnerRanksUp = RankingService.shouldRankUp(
+                winner.rank,
+                newWinnerConsecutiveWins
+            );
+
+            const newWinnerRank = winnerRanksUp
+                ? RankingService.getNextRank(winner.rank)
+                : winner.rank;
+
+            const finalWinnerConsecutiveWins = winnerRanksUp
+                ? 0
+                : newWinnerConsecutiveWins;
+
+            const newLoserConsecutiveWins =
+                RankingService.calculateLoserConsecutiveWins(loser.consecutiveWins);
+
             const completedChallenge = await tx.challenge.update({
                 where: { id: challengeId },
                 data: {
@@ -147,6 +178,8 @@ export class UpdateChallengeStatusUseCase {
                     wins: {
                         increment: 1,
                     },
+                    consecutiveWins: finalWinnerConsecutiveWins,
+                    rank: newWinnerRank,
                 },
             });
 
@@ -156,10 +189,27 @@ export class UpdateChallengeStatusUseCase {
                     losses: {
                         increment: 1,
                     },
+                    consecutiveWins: newLoserConsecutiveWins,
                 },
             });
 
-            return completedChallenge;
+            return {
+                challenge: completedChallenge,
+                ranking: {
+                    winner: {
+                        id: winnerId,
+                        previousRank: winner.rank,
+                        currentRank: newWinnerRank,
+                        rankedUp: winnerRanksUp,
+                        consecutiveWins: finalWinnerConsecutiveWins,
+                    },
+                    loser: {
+                        id: loserId,
+                        rank: loser.rank,
+                        consecutiveWins: newLoserConsecutiveWins,
+                    },
+                },
+            };
         });
     }
 }
