@@ -131,7 +131,7 @@ export class ChallengeController {
         return res.status(200).json({
             success: true,
             data: challenges,
-            message: "Retos públicos del usuario encontrados",
+            message: "Retos del usuario encontrados",
         });
     }
 }
