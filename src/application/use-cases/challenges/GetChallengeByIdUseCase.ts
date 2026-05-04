@@ -13,11 +13,11 @@ export class GetChallengeByIdUseCase {
         });
 
         if (!challenge) {
-            throw new AppError("Challenge not found", 404);
+            throw new AppError("Reto no encontrado", 404);
         }
 
         if (challenge.challengerId !== userId && challenge.challengedId !== userId) {
-            throw new AppError("You do not have access to this challenge", 403);
+            throw new AppError("No tienes acceso a este reto", 403);
         }
 
         const vehicles = await prisma.vehicle.findMany({
