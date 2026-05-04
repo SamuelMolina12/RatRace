@@ -2,6 +2,8 @@ import { Request, Response } from "express";
 import { CreateChallengeUseCase } from "../../../application/use-cases/challenges/CreateChallengeUseCase";
 import { UpdateChallengeStatusUseCase } from "../../../application/use-cases/challenges/UpdateChallengeStatusUseCase";
 import { GetChallengeByIdUseCase } from "../../../application/use-cases/challenges/GetChallengeByIdUseCase";
+import { GetMyChallengesUseCase } from "../../../application/use-cases/challenges/GetMyChallengesUseCase";
+import { GetUserChallengesUseCase } from "../../../application/use-cases/challenges/GetUserChallengesUseCase";
 
 export class ChallengeController {
     async create(req: Request, res: Response) {
@@ -99,6 +101,37 @@ export class ChallengeController {
             success: true,
             data: challenge,
             message: "Reto completado correctamente",
+        });
+    }
+
+    async findMyChallenges(req: Request, res: Response) {
+        const user = (req as any).user;
+        const { status } = req.query;
+
+        const useCase = new GetMyChallengesUseCase();
+
+        const challenges = await useCase.execute(
+            user.sub,
+            status ? String(status) : undefined
+        );
+
+        return res.status(200).json({
+            success: true,
+            data: challenges,
+            message: "Retos del usuario encontrados",
+        });
+    }
+
+    async findUserChallenges(req: Request, res: Response) {
+        const userId = req.params.userId as string;
+
+        const useCase = new GetUserChallengesUseCase();
+        const challenges = await useCase.execute(userId);
+
+        return res.status(200).json({
+            success: true,
+            data: challenges,
+            message: "Retos públicos del usuario encontrados",
         });
     }
 }

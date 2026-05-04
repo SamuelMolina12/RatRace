@@ -1,7 +1,7 @@
 import { prisma } from "../../../infrastructure/database/prisma/prisma.client";
 import { ACTIVE_CHALLENGE_STATUSES, CHALLENGE_STATUS, RACE_TYPES } from "../../../shared/constants/challenge.constants";
 import { AppError } from "../../../shared/errors/AppError";
-import { CreateChallengeDto } from "../../dtos/CreateChallengeDto";
+import { CreateChallengeDto } from "../../dtos/ChallengeDto";
 
 export class CreateChallengeUseCase {
     async execute(challengerId: string, data: CreateChallengeDto) {
