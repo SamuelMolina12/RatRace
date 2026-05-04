@@ -23,7 +23,9 @@ model User {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  vehicles     Vehicle[]
+  vehicles           Vehicle[]
+  challengesSent     Challenge[] @relation("ChallengeChallenger")
+  challengesReceived Challenge[] @relation("ChallengeChallenged")
 
   @@map("users")
 }
@@ -43,9 +45,33 @@ model Vehicle {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
-  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([userId, active])
   @@map("vehicles")
+}
+
+model Challenge {
+  id                  String    @id @default(uuid())
+  challengerId        String
+  challengedId        String
+  raceType            String
+  challengerVehicleId String
+  challengedVehicleId String?
+  status              String    @default("pending")
+  winnerId            String?
+  agreedLocation      String?
+  agreedDate          DateTime?
+  notes               String?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  challenger User @relation("ChallengeChallenger", fields: [challengerId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  challenged User @relation("ChallengeChallenged", fields: [challengedId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([challengerId])
+  @@index([challengedId])
+  @@index([status])
+  @@map("challenges")
 }
