@@ -21,6 +21,7 @@ const startServer = async () => {
       origin: "*",
     },
   });
+  app.set("io", io);
 
   initializeSocketServer(io);
 
