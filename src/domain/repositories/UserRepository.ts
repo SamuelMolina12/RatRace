@@ -2,6 +2,7 @@ export interface CreateUserData {
   username: string;
   email: string;
   passwordHash: string;
+  role?: string;
   rank?: string;
   wins?: number;
   losses?: number;
@@ -21,11 +22,13 @@ export interface UpdateUserProfileData {
   country?: string | null;
 }
 
-
 export interface UserRepository {
   findByEmail(email: string): Promise<any | null>;
   findByUsername(username: string): Promise<any | null>;
   create(data: CreateUserData): Promise<any>;
   findById(id: string): Promise<any | null>;
-   updateProfile(id: string, data: UpdateUserProfileData): Promise<any>;
+  updateProfile(id: string, data: UpdateUserProfileData): Promise<any>;
+  findAll(page: number, pageSize: number): Promise<any[]>;
+  countAll(): Promise<number>;
+  updateRole(id: string, role: string): Promise<any>;
 }
