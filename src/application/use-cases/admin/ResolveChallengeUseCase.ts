@@ -55,7 +55,7 @@ export class ResolveChallengeUseCase {
         },
       });
 
-      // Actualizar rankings si es necesario
+
       const winner =
         input.winnerId === challenge.challengerId
           ? challenge.challenger
@@ -65,7 +65,7 @@ export class ResolveChallengeUseCase {
           ? challenge.challenged
           : challenge.challenger;
 
-     // await RankingService.updateRankingAfterChallenge(winner, loser);
+
 
       return updatedChallenge;
     }

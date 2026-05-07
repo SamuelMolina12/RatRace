@@ -6,7 +6,7 @@ export class UpdateUserRoleUseCase {
   constructor(private userRepository: UserRepository) {}
 
   async execute(userId: string, newRole: string) {
-    // Validar que el rol sea válido
+
     const validRoles = Object.values(ROLES);
     if (!validRoles.includes(newRole as any)) {
       throw new AppError(

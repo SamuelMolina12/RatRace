@@ -8,6 +8,14 @@ import { PrismaUserRepository } from "../../database/prisma/PrismaUserRepository
 export class AdminController {
   private userRepository = new PrismaUserRepository();
 
+  private getSingleParamId(id: string | string[]) {
+    if (Array.isArray(id)) {
+      return null;
+    }
+
+    return id;
+  }
+
   getAllUsers = async (req: Request, res: Response) => {
     const page = req.query.page ? parseInt(req.query.page as string) : 1;
     const pageSize = req.query.pageSize
@@ -25,8 +33,16 @@ export class AdminController {
   };
 
   updateUserRole = async (req: Request, res: Response) => {
-    const { id } = req.params;
+    const id = this.getSingleParamId(req.params.id);
     const { role } = req.body;
+
+    if (!id) {
+      return res.status(400).json({
+        success: false,
+        error: "El id es requerido",
+        statusCode: 400,
+      });
+    }
 
     if (!role) {
       return res.status(400).json({
@@ -64,8 +80,16 @@ export class AdminController {
   };
 
   resolveChallenge = async (req: Request, res: Response) => {
-    const { id } = req.params;
+    const id = this.getSingleParamId(req.params.id);
     const { action, winnerId } = req.body;
+
+    if (!id) {
+      return res.status(400).json({
+        success: false,
+        error: "El id es requerido",
+        statusCode: 400,
+      });
+    }
 
     if (!action) {
       return res.status(400).json({
