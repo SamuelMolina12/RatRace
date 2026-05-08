@@ -22,6 +22,18 @@ export interface UpdateUserProfileData {
   country?: string | null;
 }
 
+export interface FindDiscoverablePilotsParams {
+  userId: string;
+  rank: string;
+  vehicleType: string;
+  page: number;
+  limit: number;
+  locality?: string;
+  city?: string;
+  state?: string;
+  country?: string;
+}
+
 export interface UserRepository {
   findByEmail(email: string): Promise<any | null>;
   findByUsername(username: string): Promise<any | null>;
@@ -31,4 +43,10 @@ export interface UserRepository {
   findAll(page: number, pageSize: number): Promise<any[]>;
   countAll(): Promise<number>;
   updateRole(id: string, role: string): Promise<any>;
+
+  findActiveVehicleByUserId(userId: string): Promise<any | null>;
+
+  findDiscoverablePilots(
+    params: FindDiscoverablePilotsParams
+  ): Promise<any>;
 }
