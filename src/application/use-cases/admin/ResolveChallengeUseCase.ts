@@ -43,31 +43,123 @@ export class ResolveChallengeUseCase {
         throw new AppError("Solo se pueden resolver retos completados", 400);
       }
 
-      const updatedChallenge = await prisma.challenge.update({
-        where: { id: input.challengeId },
-        data: {
-          winnerId: input.winnerId,
-          status: CHALLENGE_STATUS.COMPLETED,
-        },
-        include: {
-          challenger: true,
-          challenged: true,
-        },
+      return prisma.$transaction(async (tx) => {
+        const newWinnerId = input.winnerId!;
+
+        if (challenge.winnerId === newWinnerId) {
+          return challenge;
+        }
+
+        const newLoserId =
+          newWinnerId === challenge.challengerId
+            ? challenge.challengedId
+            : challenge.challengerId;
+
+
+        if (challenge.winnerId) {
+          const prevWinnerId = challenge.winnerId;
+          const prevLoserId =
+            prevWinnerId === challenge.challengerId
+              ? challenge.challengedId
+              : challenge.challengerId;
+
+          const prevWinner = await tx.user.findUnique({
+            where: { id: prevWinnerId },
+          });
+          const prevLoser = await tx.user.findUnique({
+            where: { id: prevLoserId },
+          });
+
+          if (!prevWinner || !prevLoser) {
+            throw new AppError("No se encontraron los pilotos del reto", 404);
+          }
+
+          await tx.user.update({
+            where: { id: prevWinnerId },
+            data: {
+              wins: { decrement: 1 },
+              consecutiveWins: Math.max(prevWinner.consecutiveWins - 1, 0),
+            },
+          });
+
+          await tx.user.update({
+            where: { id: prevLoserId },
+            data: {
+              losses: { decrement: 1 },
+              consecutiveWins: prevLoser.consecutiveWins + 1,
+            },
+          });
+        }
+
+        const winner = await tx.user.findUnique({ where: { id: newWinnerId } });
+        const loser = await tx.user.findUnique({ where: { id: newLoserId } });
+
+        if (!winner || !loser) {
+          throw new AppError("No se encontraron los pilotos del reto", 404);
+        }
+
+        const newWinnerConsecutiveWins = winner.consecutiveWins + 1;
+
+        const winnerRanksUp = RankingService.shouldRankUp(
+          winner.rank,
+          newWinnerConsecutiveWins,
+        );
+
+        const newWinnerRank = winnerRanksUp
+          ? RankingService.getNextRank(winner.rank)
+          : winner.rank;
+
+        const finalWinnerConsecutiveWins = winnerRanksUp
+          ? 0
+          : newWinnerConsecutiveWins;
+
+        const newLoserConsecutiveWins =
+          RankingService.calculateLoserConsecutiveWins(loser.consecutiveWins);
+
+        const updatedChallenge = await tx.challenge.update({
+          where: { id: input.challengeId },
+          data: {
+            winnerId: newWinnerId,
+            status: CHALLENGE_STATUS.COMPLETED,
+          },
+          include: { challenger: true, challenged: true },
+        });
+
+        await tx.user.update({
+          where: { id: newWinnerId },
+          data: {
+            wins: { increment: 1 },
+            consecutiveWins: finalWinnerConsecutiveWins,
+            rank: newWinnerRank,
+          },
+        });
+
+        await tx.user.update({
+          where: { id: newLoserId },
+          data: {
+            losses: { increment: 1 },
+            consecutiveWins: newLoserConsecutiveWins,
+          },
+        });
+
+        return {
+          challenge: updatedChallenge,
+          ranking: {
+            winner: {
+              id: newWinnerId,
+              previousRank: winner.rank,
+              currentRank: newWinnerRank,
+              rankedUp: winnerRanksUp,
+              consecutiveWins: finalWinnerConsecutiveWins,
+            },
+            loser: {
+              id: newLoserId,
+              rank: loser.rank,
+              consecutiveWins: newLoserConsecutiveWins,
+            },
+          },
+        };
       });
-
-
-      const winner =
-        input.winnerId === challenge.challengerId
-          ? challenge.challenger
-          : challenge.challenged;
-      const loser =
-        input.winnerId === challenge.challengerId
-          ? challenge.challenged
-          : challenge.challenger;
-
-
-
-      return updatedChallenge;
     }
 
     if (input.action === "cancel") {
