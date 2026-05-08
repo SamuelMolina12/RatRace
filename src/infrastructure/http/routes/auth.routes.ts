@@ -6,6 +6,8 @@ import { JwtService } from "../../security/JwtService";
 import { PasswordService } from "../../security/PasswordService";
 import { AuthController } from "../controllers/AuthController";
 import { authMiddleware } from "../middlewares/authMiddleware";
+import { validateRequest } from "../middlewares/validateRequest";
+import { registerSchema,loginSchema } from "../validators/auth.validators";
 
 const router = Router();
 
@@ -18,8 +20,10 @@ const loginUseCase = new LoginUseCase(userRepository, passwordService, jwtServic
 
 const authController = new AuthController(registerUseCase, loginUseCase);
 
-router.post("/register", (req, res) => authController.register(req, res));
-router.post("/login", (req, res) => authController.login(req, res));
+router.post( "/register",validateRequest(registerSchema),(req, res) => authController.register(req, res));
+
+router.post("/login", validateRequest(loginSchema), (req, res) => authController.login(req, res));
+
 router.get("/me", authMiddleware, authController.me);
 
 export default router;
