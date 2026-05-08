@@ -20,16 +20,24 @@ export class ChatController {
         next: NextFunction
     ) {
         try {
-            const userId = String(req.params.userId);
+            const userId = (req as any).user?.sub;
+
+            if (!userId) {
+                return res.status(401).json({
+                    success: false,
+                    error: "Usuario no autenticado",
+                    statusCode: 401,
+                });
+            }
 
             const conversations = await getUserConversationsUseCase.execute({
                 userId,
             });
 
-            res.status(200).json({
+            return res.status(200).json({
                 success: true,
                 data: conversations,
-                message: "Conversaciones consultadas correctamente",
+                message: "Conversaciones obtenidas correctamente",
             });
         } catch (error) {
             next(error);
@@ -42,13 +50,23 @@ export class ChatController {
         next: NextFunction
     ) {
         try {
+            const userId = (req as any).user?.sub;
             const conversationId = String(req.params.conversationId);
+
+            if (!userId) {
+                return res.status(401).json({
+                    success: false,
+                    error: "Usuario no autenticado",
+                    statusCode: 401,
+                });
+            }
 
             const messages = await getMessagesUseCase.execute({
                 conversationId,
+                userId,
             });
 
-            res.status(200).json({
+            return res.status(200).json({
                 success: true,
                 data: messages,
                 message: "Mensajes consultados correctamente",
