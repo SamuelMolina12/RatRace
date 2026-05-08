@@ -5,14 +5,14 @@ import vehiclesRoutes from "./vehicles.routes";
 import chatRoutes from "./chat.routes";
 import challengeRoutes from "./challenge.routes";
 import notificationRoutes from "./notification.routes";
-
+import adminRoutes from "./admin.routes";
 
 const router = Router();
 
 router.get("/rat", (req, res) => {
   res.json({
     success: true,
-    message: "Rat Race esta ejecutando"
+    message: "Rat Race esta ejecutando",
   });
 });
 
@@ -22,6 +22,6 @@ router.use("/vehicles", vehiclesRoutes);
 router.use("/chat", chatRoutes);
 router.use("/challenges", challengeRoutes);
 router.use("/notifications", notificationRoutes);
-
+router.use("/admin", adminRoutes);
 
 export default router;
