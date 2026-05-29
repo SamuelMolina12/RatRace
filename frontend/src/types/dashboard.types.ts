@@ -3,6 +3,7 @@ export interface UserProfile {
   username: string;
   email: string;
   role: string;
+  estado: string;
   rank: string;
   wins: number;
   losses: number;
@@ -104,6 +105,7 @@ export interface Conversation {
   participants: string[];
   lastMessage: string;
   lastMessageAt: string;
+  unreadCount?: number;
   createdAt: string;
   updatedAt: string;
 }

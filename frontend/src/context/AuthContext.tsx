@@ -19,7 +19,7 @@ interface AuthContextType {
   token: string | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: (data: LoginRequest) => Promise<void>;
+  login: (data: LoginRequest) => Promise<AuthUser | null>;
   register: (data: RegisterRequest) => Promise<void>;
   logout: () => void;
   refreshProfile: () => Promise<void>;
@@ -36,8 +36,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return stored ? JSON.parse(stored) : null;
   });
 
-  const [token, setToken] = useState<string | null>(
-    () => localStorage.getItem(TOKEN_KEY)
+  const [token, setToken] = useState<string | null>(() =>
+    localStorage.getItem(TOKEN_KEY),
   );
 
   const [isLoading, setIsLoading] = useState(true);
@@ -100,6 +100,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(profile);
       localStorage.setItem(USER_KEY, JSON.stringify(profile));
     }
+
+    return profile;
   }, []);
 
   const register = useCallback(async (data: RegisterRequest) => {
@@ -127,7 +129,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   return (
     <AuthContext.Provider
-      value={{ user, token, isAuthenticated, isLoading, login, register, logout, refreshProfile }}
+      value={{
+        user,
+        token,
+        isAuthenticated,
+        isLoading,
+        login,
+        register,
+        logout,
+        refreshProfile,
+      }}
     >
       {children}
     </AuthContext.Provider>

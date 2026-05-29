@@ -1,5 +1,11 @@
 import { prisma } from "./prisma.client";
-import { CreateUserData, UserRepository, UpdateUserProfileData, FindDiscoverablePilotsParams } from "../../../domain/repositories/UserRepository";
+import {
+  CreateUserData,
+  UserRepository,
+  UpdateUserProfileData,
+  FindDiscoverablePilotsParams,
+  AdminUserFilters,
+} from "../../../domain/repositories/UserRepository";
 
 export class PrismaUserRepository implements UserRepository {
   findByEmail(email: string) {
@@ -23,6 +29,24 @@ export class PrismaUserRepository implements UserRepository {
   findById(id: string) {
     return prisma.user.findUnique({
       where: { id },
+      select: {
+        id: true,
+        username: true,
+        email: true,
+        role: true,
+        estado: true,
+        rank: true,
+        wins: true,
+        losses: true,
+        consecutiveWins: true,
+        profilePhoto: true,
+        locality: true,
+        city: true,
+        state: true,
+        country: true,
+        createdAt: true,
+        updatedAt: true,
+      },
     });
   }
 
@@ -30,12 +54,48 @@ export class PrismaUserRepository implements UserRepository {
     return prisma.user.update({
       where: { id },
       data,
+      select: {
+        id: true,
+        username: true,
+        email: true,
+        role: true,
+        estado: true,
+        rank: true,
+        wins: true,
+        losses: true,
+        consecutiveWins: true,
+        profilePhoto: true,
+        locality: true,
+        city: true,
+        state: true,
+        country: true,
+        createdAt: true,
+        updatedAt: true,
+      },
     });
   }
 
-  findAll(page: number, pageSize: number) {
+  findAll(page: number, pageSize: number, filters: AdminUserFilters = {}) {
     const skip = (page - 1) * pageSize;
+    const where: any = {};
+
+    if (filters.search) {
+      where.OR = [
+        { username: { contains: filters.search } },
+        { email: { contains: filters.search } },
+      ];
+    }
+
+    if (filters.estado) {
+      where.estado = filters.estado;
+    }
+
+    if (filters.role) {
+      where.role = filters.role;
+    }
+
     return prisma.user.findMany({
+      where,
       skip,
       take: pageSize,
       select: {
@@ -43,10 +103,18 @@ export class PrismaUserRepository implements UserRepository {
         username: true,
         email: true,
         role: true,
+        estado: true,
         rank: true,
         wins: true,
         losses: true,
+        consecutiveWins: true,
+        profilePhoto: true,
+        locality: true,
+        city: true,
+        state: true,
+        country: true,
         createdAt: true,
+        updatedAt: true,
       },
       orderBy: {
         createdAt: "desc",
@@ -54,8 +122,33 @@ export class PrismaUserRepository implements UserRepository {
     });
   }
 
-  countAll() {
-    return prisma.user.count();
+  countAll(filters: AdminUserFilters = {}) {
+    const where: any = {};
+
+    if (filters.search) {
+      where.OR = [
+        { username: { contains: filters.search } },
+        { email: { contains: filters.search } },
+      ];
+    }
+
+    if (filters.estado) {
+      where.estado = filters.estado;
+    }
+
+    if (filters.role) {
+      where.role = filters.role;
+    }
+
+    return prisma.user.count({
+      where,
+    });
+  }
+
+  countByEstado(estado: string) {
+    return prisma.user.count({
+      where: { estado },
+    });
   }
 
   updateRole(id: string, role: string) {
@@ -67,6 +160,31 @@ export class PrismaUserRepository implements UserRepository {
         username: true,
         email: true,
         role: true,
+      },
+    });
+  }
+
+  updateEstado(id: string, estado: string) {
+    return prisma.user.update({
+      where: { id },
+      data: { estado },
+      select: {
+        id: true,
+        username: true,
+        email: true,
+        role: true,
+        estado: true,
+        rank: true,
+        wins: true,
+        losses: true,
+        consecutiveWins: true,
+        profilePhoto: true,
+        locality: true,
+        city: true,
+        state: true,
+        country: true,
+        createdAt: true,
+        updatedAt: true,
       },
     });
   }
@@ -308,6 +426,5 @@ export class PrismaUserRepository implements UserRepository {
         totalPages: Math.ceil(total / limit),
       },
     };
-
   }
 }

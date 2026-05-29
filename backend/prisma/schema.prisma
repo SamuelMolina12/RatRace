@@ -12,6 +12,7 @@ model User {
   email        String   @unique
   passwordHash String
   role         String   @default("PILOT")
+  estado       String   @default("ACTIVO")
   rank         String   @default("D")
   wins         Int      @default(0)
   losses       Int      @default(0)

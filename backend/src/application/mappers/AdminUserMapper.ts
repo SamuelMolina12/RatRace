@@ -1,7 +1,7 @@
-import { UserProfileDto } from "../dtos/UserProfileDto";
+import { AdminUserDto } from "../dtos/AdminUserDto";
 
-export class UserMapper {
-  static toUserProfileDto(user: any): UserProfileDto {
+export class AdminUserMapper {
+  static toAdminUserDto(user: any): AdminUserDto {
     return {
       id: user.id,
       username: user.username,
@@ -11,11 +11,14 @@ export class UserMapper {
       rank: user.rank,
       wins: user.wins,
       losses: user.losses,
+      consecutiveWins: user.consecutiveWins,
       profilePhoto: user.profilePhoto,
       locality: user.locality,
       city: user.city,
       state: user.state,
       country: user.country,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
     };
   }
 }

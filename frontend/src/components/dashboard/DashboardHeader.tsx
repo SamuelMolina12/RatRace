@@ -5,16 +5,15 @@ import iconoCampana from "../../assets/icons/IconoCampana.png";
 
 interface DashboardHeaderProps {
   unreadCount: number;
-  showNotifications: boolean;
   onToggleNotifications: () => void;
 }
 
 export default function DashboardHeader({
   unreadCount,
-  showNotifications,
   onToggleNotifications,
 }: DashboardHeaderProps) {
   const { user, logout } = useAuth();
+  const isAdmin = user?.role === "ADMIN";
 
   return (
     <header className="dashboard-header">
@@ -23,22 +22,38 @@ export default function DashboardHeader({
       </div>
 
       <div className="dashboard-header-right">
-        <button
-          className="header-icon-btn"
-          onClick={onToggleNotifications}
-          id="notification-bell-btn"
-        >
-          <img src={iconoCampana} alt="Notificaciones" />
-          {unreadCount > 0 && (
-            <span className="notification-badge">
-              {unreadCount > 99 ? "99+" : unreadCount}
-            </span>
-          )}
-        </button>
+        <div className="dashboard-header-action-group">
+          <button
+            className="header-icon-btn"
+            onClick={onToggleNotifications}
+            id="notification-bell-btn"
+          >
+            <img src={iconoCampana} alt="Notificaciones" />
+            {unreadCount > 0 && (
+              <span className="notification-badge">
+                {unreadCount > 99 ? "99+" : unreadCount}
+              </span>
+            )}
+          </button>
 
-        <Link to={`/profile/${user?.id}`} className="header-profile" id="profile-link">
+          {isAdmin && (
+            <Link to="/admin/dashboard" className="header-admin-btn">
+              Admin
+            </Link>
+          )}
+        </div>
+
+        <Link
+          to={`/profile/${user?.id}`}
+          className="header-profile"
+          id="profile-link"
+        >
           {user?.profilePhoto ? (
-            <img src={user.profilePhoto} alt={user.username} className="header-avatar" />
+            <img
+              src={user.profilePhoto}
+              alt={user.username}
+              className="header-avatar"
+            />
           ) : (
             <div className="header-avatar-placeholder">
               {user?.username?.charAt(0).toUpperCase()}

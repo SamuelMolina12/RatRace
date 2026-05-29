@@ -6,7 +6,11 @@ import { notificationService } from "../services/notificationService";
 import { challengeService } from "../services/challengeService";
 import { SOCKET_EVENT } from "../sockets/socketEvents";
 
-import type { Notification, Challenge, DiscoverPilot } from "../types/dashboard.types";
+import type {
+  Notification,
+  Challenge,
+  DiscoverPilot,
+} from "../types/dashboard.types";
 
 import DashboardHeader from "../components/dashboard/DashboardHeader";
 import NotificationDropdown from "../components/dashboard/NotificationDropdown";
@@ -20,22 +24,28 @@ import fondoPagina from "../assets/backgrounds/fondoPagina.png";
 import "./DashboardPage.css";
 
 export default function DashboardPage() {
-  const { user, refreshProfile } = useAuth();
+  const { refreshProfile } = useAuth();
   const { socket } = useSocket();
   const location = useLocation();
 
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [showNotifications, setShowNotifications] = useState(false);
-  
+
   const [challenges, setChallenges] = useState<Challenge[]>([]);
 
   const [openChatUserId, setOpenChatUserId] = useState<string | null>(null);
 
-  const [challengeTarget, setChallengeTarget] = useState<{ id: string; username: string } | null>(null);
+  const [challengeTarget, setChallengeTarget] = useState<{
+    id: string;
+    username: string;
+  } | null>(null);
 
   useEffect(() => {
     if (location.state) {
-      const state = location.state as { openChatUserId?: string; challengeTarget?: { id: string; username: string } };
+      const state = location.state as {
+        openChatUserId?: string;
+        challengeTarget?: { id: string; username: string };
+      };
       if (state.openChatUserId) {
         setOpenChatUserId(state.openChatUserId);
       }
@@ -83,7 +93,7 @@ export default function DashboardPage() {
 
     const handleChallengeUpdate = () => {
       loadChallenges();
-      loadNotifications(); 
+      loadNotifications();
     };
 
     const handleRankUpgraded = () => {
@@ -128,8 +138,8 @@ export default function DashboardPage() {
 
   return (
     <div className="dashboard">
-      <div 
-        className="dashboard-bg" 
+      <div
+        className="dashboard-bg"
         style={{ backgroundImage: `url(${fondoPagina})` }}
       >
         <div className="dashboard-bg-overlay" />
@@ -137,7 +147,6 @@ export default function DashboardPage() {
 
       <DashboardHeader
         unreadCount={unreadCount}
-        showNotifications={showNotifications}
         onToggleNotifications={() => setShowNotifications(!showNotifications)}
       />
 
@@ -160,10 +169,7 @@ export default function DashboardPage() {
             challenges={challenges}
             onRefresh={loadChallenges}
           />
-          <RataRetosPanel
-            challenges={challenges}
-            onRefresh={loadChallenges}
-          />
+          <RataRetosPanel challenges={challenges} onRefresh={loadChallenges} />
         </div>
 
         <ChatPanel

@@ -1,12 +1,24 @@
 import { Request, Response } from "express";
-import { GetAllUsersUseCase } from "../../../application/use-cases/admin/GetAllUsersUseCase";
+import { GetAllAdminUsersUseCase } from "../../../application/use-cases/admin/GetAllAdminUsersUseCase";
+import { GetUserByIdUseCase } from "../../../application/use-cases/admin/GetUserByIdUseCase";
+import { SuspendUserUseCase } from "../../../application/use-cases/admin/SuspendUserUseCase";
+import { ActivateUserUseCase } from "../../../application/use-cases/admin/ActivateUserUseCase";
+import { GetAdminDashboardUseCase } from "../../../application/use-cases/admin/GetAdminDashboardUseCase";
 import { UpdateUserRoleUseCase } from "../../../application/use-cases/admin/UpdateUserRoleUseCase";
 import { GetAllChallengesUseCase } from "../../../application/use-cases/admin/GetAllChallengesUseCase";
 import { ResolveChallengeUseCase } from "../../../application/use-cases/admin/ResolveChallengeUseCase";
-import { PrismaUserRepository } from "../../database/prisma/PrismaUserRepository";
 
 export class AdminController {
-  private userRepository = new PrismaUserRepository();
+  constructor(
+    private getAllUsersUseCase: GetAllAdminUsersUseCase,
+    private getUserByIdUseCase: GetUserByIdUseCase,
+    private suspendUserUseCase: SuspendUserUseCase,
+    private activateUserUseCase: ActivateUserUseCase,
+    private getAdminDashboardUseCase: GetAdminDashboardUseCase,
+    private updateUserRoleUseCase: UpdateUserRoleUseCase,
+    private getAllChallengesUseCase: GetAllChallengesUseCase,
+    private resolveChallengeUseCase: ResolveChallengeUseCase,
+  ) {}
 
   private getSingleParamId(id: string | string[]) {
     if (Array.isArray(id)) {
@@ -21,14 +33,94 @@ export class AdminController {
     const pageSize = req.query.pageSize
       ? parseInt(req.query.pageSize as string)
       : 20;
+    const search = req.query.search
+      ? String(req.query.search).trim()
+      : undefined;
+    const estado = req.query.estado
+      ? String(req.query.estado).trim()
+      : undefined;
+    const role = req.query.role ? String(req.query.role).trim() : undefined;
 
-    const useCase = new GetAllUsersUseCase(this.userRepository);
-    const result = await useCase.execute(page, pageSize);
+    const result = await this.getAllUsersUseCase.execute(page, pageSize, {
+      search,
+      estado,
+      role,
+    });
 
     return res.json({
       success: true,
       data: result,
       message: "Usuarios listados correctamente",
+    });
+  };
+
+  getUserById = async (req: Request, res: Response) => {
+    const id = this.getSingleParamId(req.params.id);
+
+    if (!id) {
+      return res.status(400).json({
+        success: false,
+        error: "El id es requerido",
+        statusCode: 400,
+      });
+    }
+
+    const result = await this.getUserByIdUseCase.execute(id);
+
+    return res.json({
+      success: true,
+      data: result,
+      message: "Usuario obtenido correctamente",
+    });
+  };
+
+  suspendUser = async (req: Request, res: Response) => {
+    const id = this.getSingleParamId(req.params.id);
+
+    if (!id) {
+      return res.status(400).json({
+        success: false,
+        error: "El id es requerido",
+        statusCode: 400,
+      });
+    }
+
+    const result = await this.suspendUserUseCase.execute(id);
+
+    return res.json({
+      success: true,
+      data: result,
+      message: "Usuario suspendido correctamente",
+    });
+  };
+
+  activateUser = async (req: Request, res: Response) => {
+    const id = this.getSingleParamId(req.params.id);
+
+    if (!id) {
+      return res.status(400).json({
+        success: false,
+        error: "El id es requerido",
+        statusCode: 400,
+      });
+    }
+
+    const result = await this.activateUserUseCase.execute(id);
+
+    return res.json({
+      success: true,
+      data: result,
+      message: "Usuario activado correctamente",
+    });
+  };
+
+  getDashboard = async (_req: Request, res: Response) => {
+    const result = await this.getAdminDashboardUseCase.execute();
+
+    return res.json({
+      success: true,
+      data: result,
+      message: "Dashboard obtenido correctamente",
     });
   };
 
@@ -52,8 +144,7 @@ export class AdminController {
       });
     }
 
-    const useCase = new UpdateUserRoleUseCase(this.userRepository);
-    const result = await useCase.execute(id, role);
+    const result = await this.updateUserRoleUseCase.execute(id, role);
 
     return res.json({
       success: true,
@@ -69,8 +160,11 @@ export class AdminController {
       ? parseInt(req.query.pageSize as string)
       : 20;
 
-    const useCase = new GetAllChallengesUseCase();
-    const result = await useCase.execute(status, page, pageSize);
+    const result = await this.getAllChallengesUseCase.execute(
+      status,
+      page,
+      pageSize,
+    );
 
     return res.json({
       success: true,
@@ -99,8 +193,7 @@ export class AdminController {
       });
     }
 
-    const useCase = new ResolveChallengeUseCase();
-    const result = await useCase.execute({
+    const result = await this.resolveChallengeUseCase.execute({
       challengeId: id,
       action,
       winnerId,

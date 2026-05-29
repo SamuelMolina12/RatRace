@@ -20,12 +20,12 @@ export interface ZoneInput {
   country: string;
 }
 
-
 export interface AuthUser {
   id: string;
   username: string;
   email: string;
   role: string;
+  estado: string;
   rank: string;
   wins: number;
   losses: number;
@@ -41,7 +41,6 @@ export interface AuthResponse {
   token: string;
   user: AuthUser;
 }
-
 
 export interface ApiResponse<T> {
   success: boolean;

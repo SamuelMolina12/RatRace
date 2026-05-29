@@ -7,7 +7,7 @@ import {
 } from "react";
 import type { Socket } from "socket.io-client";
 import { useAuth } from "./AuthContext";
-import { connectSocket, disconnectSocket, getSocket } from "../sockets/socketClient";
+import { connectSocket, disconnectSocket } from "../sockets/socketClient";
 
 interface SocketContextType {
   socket: Socket | null;
