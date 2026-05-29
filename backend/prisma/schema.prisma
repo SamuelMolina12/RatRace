@@ -63,6 +63,8 @@ model Challenge {
   challengedVehicleId String?
   status              String    @default("pending")
   winnerId            String?
+  challengerClaim     String?
+  challengedClaim     String?
   agreedLocation      String?
   agreedDate          DateTime?
   notes               String?

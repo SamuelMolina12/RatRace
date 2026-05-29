@@ -81,8 +81,6 @@ export class PrismaUserRepository implements UserRepository {
   }
 
   async findDiscoverablePilots(params: FindDiscoverablePilotsParams) {
-    const skip = (params.page - 1) * params.limit;
-
     const where: any = {
       id: {
         not: params.userId,
@@ -112,11 +110,26 @@ export class PrismaUserRepository implements UserRepository {
       where.country = params.country;
     }
 
-    const [items, total] = await Promise.all([
-      prisma.user.findMany({
+    const total = await prisma.user.count({ where });
+
+    if (total === 0) {
+      return {
+        items: [],
+        pagination: {
+          page: params.page,
+          limit: params.limit,
+          total: 0,
+          totalPages: 0,
+        },
+      };
+    }
+
+    const limit = params.limit;
+
+    // Si el total es menor o igual al límite, devolvemos la lista completa siempre (evita duplicados en la misma página)
+    if (total <= limit) {
+      const items = await prisma.user.findMany({
         where,
-        skip,
-        take: params.limit,
         orderBy: {
           username: "asc",
         },
@@ -148,9 +161,143 @@ export class PrismaUserRepository implements UserRepository {
             },
           },
         },
-      }),
-      prisma.user.count({ where }),
-    ]);
+      });
+
+      return {
+        items,
+        pagination: {
+          page: params.page,
+          limit: params.limit,
+          total,
+          totalPages: 1,
+        },
+      };
+    }
+
+    // Si el total es mayor al límite, calculamos el índice circular
+    const startIndex = ((params.page - 1) * limit) % total;
+
+    let items: any[] = [];
+    if (startIndex + limit <= total) {
+      // Caso simple: la porción no se desborda al final
+      items = await prisma.user.findMany({
+        where,
+        skip: startIndex,
+        take: limit,
+        orderBy: {
+          username: "asc",
+        },
+        select: {
+          id: true,
+          username: true,
+          profilePhoto: true,
+          locality: true,
+          city: true,
+          state: true,
+          country: true,
+          rank: true,
+          wins: true,
+          losses: true,
+          consecutiveWins: true,
+          vehicles: {
+            where: {
+              active: true,
+            },
+            select: {
+              id: true,
+              vehicleType: true,
+              brand: true,
+              model: true,
+              year: true,
+              color: true,
+              photo: true,
+              active: true,
+            },
+          },
+        },
+      });
+    } else {
+      // Caso circular: se desborda y debemos dar la vuelta al inicio
+      const firstPartCount = total - startIndex;
+      const secondPartCount = limit - firstPartCount;
+
+      const [firstPart, secondPart] = await Promise.all([
+        prisma.user.findMany({
+          where,
+          skip: startIndex,
+          take: firstPartCount,
+          orderBy: {
+            username: "asc",
+          },
+          select: {
+            id: true,
+            username: true,
+            profilePhoto: true,
+            locality: true,
+            city: true,
+            state: true,
+            country: true,
+            rank: true,
+            wins: true,
+            losses: true,
+            consecutiveWins: true,
+            vehicles: {
+              where: {
+                active: true,
+              },
+              select: {
+                id: true,
+                vehicleType: true,
+                brand: true,
+                model: true,
+                year: true,
+                color: true,
+                photo: true,
+                active: true,
+              },
+            },
+          },
+        }),
+        prisma.user.findMany({
+          where,
+          skip: 0,
+          take: secondPartCount,
+          orderBy: {
+            username: "asc",
+          },
+          select: {
+            id: true,
+            username: true,
+            profilePhoto: true,
+            locality: true,
+            city: true,
+            state: true,
+            country: true,
+            rank: true,
+            wins: true,
+            losses: true,
+            consecutiveWins: true,
+            vehicles: {
+              where: {
+                active: true,
+              },
+              select: {
+                id: true,
+                vehicleType: true,
+                brand: true,
+                model: true,
+                year: true,
+                color: true,
+                photo: true,
+                active: true,
+              },
+            },
+          },
+        }),
+      ]);
+
+      items = [...firstPart, ...secondPart];
+    }
 
     return {
       items,
@@ -158,7 +305,7 @@ export class PrismaUserRepository implements UserRepository {
         page: params.page,
         limit: params.limit,
         total,
-        totalPages: Math.ceil(total / params.limit),
+        totalPages: Math.ceil(total / limit),
       },
     };
 
