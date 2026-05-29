@@ -713,15 +713,6 @@ export default function ProfilePage() {
                   placeholder="Tu nombre de piloto"
                 />
               </div>
-              <div className="p-modal-field">
-                <label className="p-modal-label">Foto de perfil (URL)</label>
-                <input
-                  className="p-modal-input"
-                  value={profileForm.profilePhoto}
-                  onChange={(e) => setProfileForm({ ...profileForm, profilePhoto: e.target.value })}
-                  placeholder="https://ejemplo.com/foto.jpg"
-                />
-              </div>
               <div className="p-modal-row">
                 <div className="p-modal-field">
                   <label className="p-modal-label">Localidad</label>

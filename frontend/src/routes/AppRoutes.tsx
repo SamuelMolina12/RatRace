@@ -83,7 +83,8 @@ export default function AppRoutes() {
         element={<Navigate to="/admin/dashboard" replace />}
       />
 
-      <Route path="*" element={<Navigate to="/" replace />} />
+      <Route path="/" element={<Navigate to="/dashboard" replace />} />
+      <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>
   );
 }
