@@ -188,10 +188,55 @@ export class ChallengeController {
         const useCase = new UpdateChallengeStatusUseCase();
         const result = await useCase.complete(id, user.sub, winnerId);
 
-        const challenge = (result as any).challenge ?? result;
+        const challenge = (result as any).challenge;
         const ranking = (result as any).ranking;
+        const isWaiting = (result as any).waitingForOther;
+        const isDisputed = (result as any).disputed;
 
         const io = req.app.get("io") as Server;
+
+        if (isWaiting) {
+            return res.status(200).json({
+                success: true,
+                data: result,
+                message: "Reclamación guardada, esperando confirmación del otro piloto",
+            });
+        }
+
+        if (isDisputed) {
+            emitToUsers(
+                io,
+                [challenge.challengerId, challenge.challengedId],
+                SOCKET_EVENT.CHALLENGE_COMPLETED,
+                {
+                    challenge,
+                    message: "El reto ha entrado en disputa",
+                }
+            );
+
+            await Promise.all([
+                NotificationService.createAndEmit(io, {
+                    userId: challenge.challengerId,
+                    type: NOTIFICATION_TYPE.CHALLENGE_COMPLETED,
+                    message: "El reto ha entrado en disputa por desacuerdo",
+                    referenceId: challenge.id,
+                    data: { challenge },
+                }),
+                NotificationService.createAndEmit(io, {
+                    userId: challenge.challengedId,
+                    type: NOTIFICATION_TYPE.CHALLENGE_COMPLETED,
+                    message: "El reto ha entrado en disputa por desacuerdo",
+                    referenceId: challenge.id,
+                    data: { challenge },
+                }),
+            ]);
+
+            return res.status(200).json({
+                success: true,
+                data: result,
+                message: "El reto está en disputa",
+            });
+        }
 
         emitToUsers(
             io,

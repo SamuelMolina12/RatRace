@@ -5,12 +5,14 @@ export const CHALLENGE_STATUS = {
   IN_PROGRESS: "in_progress",
   COMPLETED: "completed",
   CANCELLED: "cancelled",
+  DISPUTED: "disputed",
 } as const;
 
 export const ACTIVE_CHALLENGE_STATUSES = [
   CHALLENGE_STATUS.PENDING,
   CHALLENGE_STATUS.ACCEPTED,
   CHALLENGE_STATUS.IN_PROGRESS,
+  CHALLENGE_STATUS.DISPUTED,
 ];
 
 export const RACE_TYPES = {

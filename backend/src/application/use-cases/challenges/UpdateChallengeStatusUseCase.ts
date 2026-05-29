@@ -128,88 +128,125 @@ export class UpdateChallengeStatusUseCase {
             throw new AppError("El ganador debe ser uno de los pilotos del reto", 400);
         }
 
-        const loserId =
-            winnerId === challenge.challengerId
-                ? challenge.challengedId
-                : challenge.challengerId;
+        const isChallenger = userId === challenge.challengerId;
+        const newChallengerClaim = isChallenger ? winnerId : challenge.challengerClaim;
+        const newChallengedClaim = !isChallenger ? winnerId : challenge.challengedClaim;
 
-        return prisma.$transaction(async (tx) => {
-            const winner = await tx.user.findUnique({
-                where: { id: winnerId },
-            });
+        if (newChallengerClaim && newChallengedClaim) {
+            if (newChallengerClaim === newChallengedClaim) {
+                // Hay acuerdo
+                const finalWinnerId = newChallengerClaim;
+                const loserId =
+                    finalWinnerId === challenge.challengerId
+                        ? challenge.challengedId
+                        : challenge.challengerId;
 
-            const loser = await tx.user.findUnique({
-                where: { id: loserId },
-            });
+                return prisma.$transaction(async (tx) => {
+                    const winner = await tx.user.findUnique({
+                        where: { id: finalWinnerId },
+                    });
 
-            if (!winner || !loser) {
-                throw new AppError("No se encontraron los pilotos del reto", 404);
+                    const loser = await tx.user.findUnique({
+                        where: { id: loserId },
+                    });
+
+                    if (!winner || !loser) {
+                        throw new AppError("No se encontraron los pilotos del reto", 404);
+                    }
+
+                    const newWinnerConsecutiveWins = winner.consecutiveWins + 1;
+
+                    const winnerRanksUp = RankingService.shouldRankUp(
+                        winner.rank,
+                        newWinnerConsecutiveWins
+                    );
+
+                    const newWinnerRank = winnerRanksUp
+                        ? RankingService.getNextRank(winner.rank)
+                        : winner.rank;
+
+                    const finalWinnerConsecutiveWins = winnerRanksUp
+                        ? 0
+                        : newWinnerConsecutiveWins;
+
+                    const newLoserConsecutiveWins =
+                        RankingService.calculateLoserConsecutiveWins(loser.consecutiveWins);
+
+                    const completedChallenge = await tx.challenge.update({
+                        where: { id: challengeId },
+                        data: {
+                            status: CHALLENGE_STATUS.COMPLETED,
+                            winnerId: finalWinnerId,
+                            challengerClaim: newChallengerClaim,
+                            challengedClaim: newChallengedClaim,
+                        },
+                    });
+
+                    await tx.user.update({
+                        where: { id: finalWinnerId },
+                        data: {
+                            wins: { increment: 1 },
+                            consecutiveWins: finalWinnerConsecutiveWins,
+                            rank: newWinnerRank,
+                        },
+                    });
+
+                    await tx.user.update({
+                        where: { id: loserId },
+                        data: {
+                            losses: { increment: 1 },
+                            consecutiveWins: newLoserConsecutiveWins,
+                        },
+                    });
+
+                    return {
+                        challenge: completedChallenge,
+                        ranking: {
+                            winner: {
+                                id: finalWinnerId,
+                                previousRank: winner.rank,
+                                currentRank: newWinnerRank,
+                                rankedUp: winnerRanksUp,
+                                consecutiveWins: finalWinnerConsecutiveWins,
+                            },
+                            loser: {
+                                id: loserId,
+                                rank: loser.rank,
+                                consecutiveWins: newLoserConsecutiveWins,
+                            },
+                        },
+                    };
+                });
+            } else {
+                // No hay acuerdo: Disputa
+                const disputedChallenge = await prisma.challenge.update({
+                    where: { id: challengeId },
+                    data: {
+                        status: CHALLENGE_STATUS.DISPUTED,
+                        challengerClaim: newChallengerClaim,
+                        challengedClaim: newChallengedClaim,
+                    },
+                });
+
+                return {
+                    challenge: disputedChallenge,
+                    disputed: true,
+                };
             }
-
-            const newWinnerConsecutiveWins = winner.consecutiveWins + 1;
-
-            const winnerRanksUp = RankingService.shouldRankUp(
-                winner.rank,
-                newWinnerConsecutiveWins
-            );
-
-            const newWinnerRank = winnerRanksUp
-                ? RankingService.getNextRank(winner.rank)
-                : winner.rank;
-
-            const finalWinnerConsecutiveWins = winnerRanksUp
-                ? 0
-                : newWinnerConsecutiveWins;
-
-            const newLoserConsecutiveWins =
-                RankingService.calculateLoserConsecutiveWins(loser.consecutiveWins);
-
-            const completedChallenge = await tx.challenge.update({
+        } else {
+            // Solo uno ha reclamado
+            const updatedChallenge = await prisma.challenge.update({
                 where: { id: challengeId },
                 data: {
-                    status: CHALLENGE_STATUS.COMPLETED,
-                    winnerId,
-                },
-            });
-
-            await tx.user.update({
-                where: { id: winnerId },
-                data: {
-                    wins: {
-                        increment: 1,
-                    },
-                    consecutiveWins: finalWinnerConsecutiveWins,
-                    rank: newWinnerRank,
-                },
-            });
-
-            await tx.user.update({
-                where: { id: loserId },
-                data: {
-                    losses: {
-                        increment: 1,
-                    },
-                    consecutiveWins: newLoserConsecutiveWins,
+                    challengerClaim: newChallengerClaim,
+                    challengedClaim: newChallengedClaim,
                 },
             });
 
             return {
-                challenge: completedChallenge,
-                ranking: {
-                    winner: {
-                        id: winnerId,
-                        previousRank: winner.rank,
-                        currentRank: newWinnerRank,
-                        rankedUp: winnerRanksUp,
-                        consecutiveWins: finalWinnerConsecutiveWins,
-                    },
-                    loser: {
-                        id: loserId,
-                        rank: loser.rank,
-                        consecutiveWins: newLoserConsecutiveWins,
-                    },
-                },
+                challenge: updatedChallenge,
+                waitingForOther: true,
             };
-        });
+        }
     }
 }

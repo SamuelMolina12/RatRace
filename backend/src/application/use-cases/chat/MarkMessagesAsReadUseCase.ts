@@ -1,4 +1,5 @@
 import { MessageRepository } from "../../../domain/repositories/MessageRepository";
+import { AppError } from "../../../shared/errors/AppError";
 
 interface MarkMessagesAsReadRequest {
     conversationId: string;
@@ -10,7 +11,7 @@ export class MarkMessagesAsReadUseCase {
 
     async execute(request: MarkMessagesAsReadRequest) {
         if (!request.conversationId || !request.receiverId) {
-            throw new Error("conversationId y receiverId son obligatorios");
+            throw new AppError("conversationId y receiverId son obligatorios", 400);
         }
 
         await this.messageRepository.markAsRead(
