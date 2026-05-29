@@ -1,0 +1,130 @@
+/* ─── Button Component Styles ────────────────────────────── */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 14px 28px;
+  border: none;
+  border-radius: 8px;
+  font-family: var(--font-heading);
+  font-size: 1rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn--full {
+  width: 100%;
+}
+
+.btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* ─── Primary ────────────────────────────────────────────── */
+
+.btn--primary {
+  background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent-secondary) 100%);
+  color: #fff;
+  box-shadow:
+    0 4px 15px rgba(230, 57, 70, 0.35),
+    0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.btn--primary::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, var(--color-accent-secondary) 0%, var(--color-accent) 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.btn--primary:hover:not(:disabled)::before {
+  opacity: 1;
+}
+
+.btn--primary:hover:not(:disabled) {
+  box-shadow:
+    0 6px 25px rgba(230, 57, 70, 0.5),
+    0 3px 10px rgba(0, 0, 0, 0.3);
+  transform: translateY(-1px);
+}
+
+.btn--primary:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow:
+    0 2px 8px rgba(230, 57, 70, 0.3),
+    0 1px 4px rgba(0, 0, 0, 0.2);
+}
+
+.btn-text,
+.btn-arrow {
+  position: relative;
+  z-index: 1;
+}
+
+.btn-arrow {
+  display: flex;
+  align-items: center;
+  transition: transform 0.3s ease;
+}
+
+.btn--primary:hover:not(:disabled) .btn-arrow {
+  transform: translateX(4px);
+}
+
+/* ─── Secondary ──────────────────────────────────────────── */
+
+.btn--secondary {
+  background: transparent;
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-input-border);
+}
+
+.btn--secondary:hover:not(:disabled) {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+  background: rgba(230, 57, 70, 0.05);
+}
+
+/* ─── Text ───────────────────────────────────────────────── */
+
+.btn--text {
+  background: transparent;
+  color: var(--color-accent);
+  padding: 8px 4px;
+  text-transform: none;
+  letter-spacing: 0;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.btn--text:hover:not(:disabled) {
+  color: var(--color-accent-secondary);
+  text-decoration: underline;
+}
+
+/* ─── Spinner ────────────────────────────────────────────── */
+
+.btn-spinner {
+  width: 22px;
+  height: 22px;
+  border: 3px solid rgba(255, 255, 255, 0.25);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: btnSpin 0.7s linear infinite;
+}
+
+@keyframes btnSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
