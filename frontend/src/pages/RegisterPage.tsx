@@ -154,7 +154,7 @@ export default function RegisterPage() {
                   label="Localidad"
                   type="text"
                   id="register-locality"
-                  placeholder="Ej: Calatrava"
+                  placeholder=""
                   value={locality}
                   onChange={(e) => setLocality(e.target.value)}
                 />
@@ -163,7 +163,7 @@ export default function RegisterPage() {
                   label="Ciudad"
                   type="text"
                   id="register-city"
-                  placeholder="Ej: Medellín"
+                  placeholder=""
                   value={city}
                   onChange={(e) => setCity(e.target.value)}
                 />
@@ -172,7 +172,7 @@ export default function RegisterPage() {
                   label="Departamento"
                   type="text"
                   id="register-state"
-                  placeholder="Ej: Antioquia"
+                  placeholder=""
                   value={state}
                   onChange={(e) => setState(e.target.value)}
                 />
@@ -181,7 +181,7 @@ export default function RegisterPage() {
                   label="País"
                   type="text"
                   id="register-country"
-                  placeholder="Ej: Colombia"
+                  placeholder=""
                   value={country}
                   onChange={(e) => setCountry(e.target.value)}
                 />

@@ -33,7 +33,7 @@ interface VehicleForm {
 }
 
 const EMPTY_VEHICLE_FORM: VehicleForm = {
-  vehicleType: "motorcycle",
+  vehicleType: "Moto",
   brand: "",
   model: "",
   year: new Date().getFullYear().toString(),
@@ -720,7 +720,7 @@ export default function ProfilePage() {
                     className="p-modal-input"
                     value={profileForm.locality}
                     onChange={(e) => setProfileForm({ ...profileForm, locality: e.target.value })}
-                    placeholder="Tu barrio"
+                    placeholder=""
                   />
                 </div>
                 <div className="p-modal-field">
@@ -729,7 +729,7 @@ export default function ProfilePage() {
                     className="p-modal-input"
                     value={profileForm.city}
                     onChange={(e) => setProfileForm({ ...profileForm, city: e.target.value })}
-                    placeholder="Tu ciudad"
+                    placeholder=""
                   />
                 </div>
               </div>
@@ -740,7 +740,7 @@ export default function ProfilePage() {
                     className="p-modal-input"
                     value={profileForm.state}
                     onChange={(e) => setProfileForm({ ...profileForm, state: e.target.value })}
-                    placeholder="Tu estado"
+                    placeholder=""
                   />
                 </div>
                 <div className="p-modal-field">
@@ -749,7 +749,7 @@ export default function ProfilePage() {
                     className="p-modal-input"
                     value={profileForm.country}
                     onChange={(e) => setProfileForm({ ...profileForm, country: e.target.value })}
-                    placeholder="Tu país"
+                    placeholder=""
                   />
                 </div>
               </div>
@@ -792,8 +792,22 @@ export default function ProfilePage() {
                   value={vehicleForm.vehicleType}
                   onChange={(e) => setVehicleForm({ ...vehicleForm, vehicleType: e.target.value })}
                 >
-                  <option value="motorcycle">Motocicleta</option>
-                  <option value="car">Automóvil</option>
+                  <option value="Carro">Carro</option>
+                  <option value="Moto">Moto</option>
+                  <option value="Cuatrimoto">Cuatrimoto</option>
+                  <option value="Snobour">Snobour</option>
+                  <option value="Carro de supermercado">Carro de supermercado</option>
+                  <option value="Gocar">Gocar</option>
+                  <option value="Monociclo">Monociclo</option>
+                  <option value="Silla de ruedas">Silla de ruedas</option>
+                  <option value="Patines">Patines</option>
+                  <option value="Mostertruck">Mostertruck</option>
+                  <option value="Muletas">Muletas</option>
+                  <option value="Jeep">Jeep</option>
+                  <option value="Caballo">Caballo</option>
+                  <option value="Bicicleta">Bicicleta</option>
+                  <option value="Jetski">Jetski</option>
+                  <option value="Tanque">Tanque</option>
                 </select>
               </div>
               <div className="p-modal-row">
@@ -803,7 +817,7 @@ export default function ProfilePage() {
                     className="p-modal-input"
                     value={vehicleForm.brand}
                     onChange={(e) => setVehicleForm({ ...vehicleForm, brand: e.target.value })}
-                    placeholder="Yamaha, Honda, BMW..."
+                    placeholder=""
                   />
                 </div>
                 <div className="p-modal-field">
@@ -812,7 +826,7 @@ export default function ProfilePage() {
                     className="p-modal-input"
                     value={vehicleForm.model}
                     onChange={(e) => setVehicleForm({ ...vehicleForm, model: e.target.value })}
-                    placeholder="YZF-R3, Ninja 400..."
+                    placeholder=""
                   />
                 </div>
               </div>
@@ -824,7 +838,7 @@ export default function ProfilePage() {
                     type="number"
                     value={vehicleForm.year}
                     onChange={(e) => setVehicleForm({ ...vehicleForm, year: e.target.value })}
-                    placeholder="2024"
+                    placeholder=""
                     min="1950"
                     max="2030"
                   />
@@ -835,7 +849,7 @@ export default function ProfilePage() {
                     className="p-modal-input"
                     value={vehicleForm.color}
                     onChange={(e) => setVehicleForm({ ...vehicleForm, color: e.target.value })}
-                    placeholder="Rojo, Azul..."
+                    placeholder=""
                   />
                 </div>
               </div>
@@ -845,7 +859,7 @@ export default function ProfilePage() {
                   className="p-modal-input"
                   value={vehicleForm.plate}
                   onChange={(e) => setVehicleForm({ ...vehicleForm, plate: e.target.value })}
-                  placeholder="ABC123"
+                  placeholder=""
                 />
               </div>
               <div className="p-modal-field">
@@ -854,7 +868,7 @@ export default function ProfilePage() {
                   className="p-modal-input"
                   value={vehicleForm.photo}
                   onChange={(e) => setVehicleForm({ ...vehicleForm, photo: e.target.value })}
-                  placeholder="https://ejemplo.com/moto.jpg"
+                  placeholder=""
                 />
               </div>
               <div className="p-modal-field">
@@ -863,7 +877,7 @@ export default function ProfilePage() {
                   className="p-modal-textarea"
                   value={vehicleForm.modifications}
                   onChange={(e) => setVehicleForm({ ...vehicleForm, modifications: e.target.value })}
-                  placeholder="Escape deportivo, llantas de alto agarre..."
+                  placeholder=""
                   rows={3}
                 />
               </div>
