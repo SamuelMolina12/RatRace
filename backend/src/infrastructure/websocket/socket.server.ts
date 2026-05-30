@@ -51,6 +51,11 @@ export const initializeSocketServer = (io: Server) => {
             io.emit(SOCKET_EVENT.USER_ONLINE, {
                 userId: payload.userId,
             });
+
+            // Send the list of all currently online user IDs to the newly connected user
+            socket.emit(SOCKET_EVENT.USERS_ONLINE_LIST, {
+                userIds: Array.from(onlineUsers.keys()),
+            });
         });
 
         socket.on(SOCKET_EVENT.CHAT_MESSAGE, async (payload: SendMessagePayload) => {

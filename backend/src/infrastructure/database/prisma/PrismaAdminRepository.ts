@@ -10,9 +10,7 @@ export class PrismaAdminRepository implements AdminRepository {
   }
 
   countUsersByEstado(estado: string) {
-    return prisma.user.count({
-      where: { estado },
-    });
+    return 0;
   }
 
   countVehicles() {

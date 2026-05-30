@@ -17,7 +17,7 @@ model User {
   wins         Int      @default(0)
   losses       Int      @default(0)
   consecutiveWins Int @default(0)
-  profilePhoto String?
+  profilePhoto String?  @db.NVarChar(Max)
   locality     String?
   city         String?
   state        String?
@@ -42,7 +42,7 @@ model Vehicle {
   year          Int
   color         String
   plate         String?  @unique
-  photo         String?
+  photo         String?  @db.NVarChar(Max)
   modifications String?
   active        Boolean  @default(false)
   createdAt     DateTime @default(now())

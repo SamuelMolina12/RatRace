@@ -2,6 +2,7 @@ export const SOCKET_EVENT = {
   USER_REGISTER: "user:register",
   USER_ONLINE: "user:online",
   USER_OFFLINE: "user:offline",
+  USERS_ONLINE_LIST: "users:online_list",
 
   CHAT_MESSAGE: "chat:message",
   CHAT_MESSAGE_RECEIVED: "chat:message:received",

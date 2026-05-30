@@ -19,7 +19,7 @@ export function errorHandler(
 
   return res.status(500).json({
     success: false,
-    error: "Error interno del servidor",
+    error: process.env.NODE_ENV === "production" ? "Error interno del servidor" : err.message,
     statusCode: 500
   });
 }

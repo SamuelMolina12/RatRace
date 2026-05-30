@@ -248,6 +248,23 @@ export default function AdminChallengesPage() {
                             <div className="admin-user-email">
                               {challenge.raceType}
                             </div>
+                            {challenge.status === "disputed" && (
+                              <div style={{
+                                fontSize: "0.75rem",
+                                color: "#ef4444",
+                                marginTop: "6px",
+                                background: "rgba(239, 68, 68, 0.05)",
+                                border: "1px solid rgba(239, 68, 68, 0.2)",
+                                borderRadius: "4px",
+                                padding: "6px 8px",
+                                display: "inline-block",
+                                lineHeight: "1.4"
+                              }}>
+                                ⚠️ Conflicto: 
+                                <strong> {challenge.challenger.username}</strong> reclamó ganador a <em>{challenge.challengerClaim === challenge.challengerId ? challenge.challenger.username : challenge.challenged.username}</em> | 
+                                <strong> {challenge.challenged.username}</strong> reclamó ganador a <em>{challenge.challengedClaim === challenge.challengedId ? challenge.challenged.username : challenge.challenger.username}</em>
+                              </div>
+                            )}
                             <div
                               className="admin-user-meta"
                               style={{ marginTop: "8px" }}
@@ -260,7 +277,9 @@ export default function AdminChallengesPage() {
                               <span className="admin-user-rank">
                                 Ganador:{" "}
                                 {challenge.winnerId
-                                  ? challenge.winnerId
+                                  ? challenge.winnerId === challenge.challengerId
+                                    ? challenge.challenger.username
+                                    : challenge.challenged.username
                                   : "Sin definir"}
                               </span>
                             </div>

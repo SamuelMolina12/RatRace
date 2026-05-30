@@ -8,6 +8,7 @@ import {
 import type { Socket } from "socket.io-client";
 import { useAuth } from "./AuthContext";
 import { connectSocket, disconnectSocket } from "../sockets/socketClient";
+import { SOCKET_EVENT } from "../sockets/socketEvents";
 
 interface SocketContextType {
   socket: Socket | null;
@@ -29,7 +30,7 @@ export function SocketProvider({ children }: { children: ReactNode }) {
       const s = connectSocket(user.id);
       setSocket(s);
 
-      s.on("user:online", ({ userId }: { userId: string }) => {
+      s.on(SOCKET_EVENT.USER_ONLINE, ({ userId }: { userId: string }) => {
         setOnlineUsers((prev) => {
           const next = new Set(prev);
           next.add(userId);
@@ -37,12 +38,16 @@ export function SocketProvider({ children }: { children: ReactNode }) {
         });
       });
 
-      s.on("user:offline", ({ userId }: { userId: string }) => {
+      s.on(SOCKET_EVENT.USER_OFFLINE, ({ userId }: { userId: string }) => {
         setOnlineUsers((prev) => {
           const next = new Set(prev);
           next.delete(userId);
           return next;
         });
+      });
+
+      s.on(SOCKET_EVENT.USERS_ONLINE_LIST, ({ userIds }: { userIds: string[] }) => {
+        setOnlineUsers(new Set(userIds));
       });
 
       return () => {

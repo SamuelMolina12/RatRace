@@ -34,7 +34,6 @@ export class PrismaUserRepository implements UserRepository {
         username: true,
         email: true,
         role: true,
-        estado: true,
         rank: true,
         wins: true,
         losses: true,
@@ -59,7 +58,6 @@ export class PrismaUserRepository implements UserRepository {
         username: true,
         email: true,
         role: true,
-        estado: true,
         rank: true,
         wins: true,
         losses: true,
@@ -86,10 +84,6 @@ export class PrismaUserRepository implements UserRepository {
       ];
     }
 
-    if (filters.estado) {
-      where.estado = filters.estado;
-    }
-
     if (filters.role) {
       where.role = filters.role;
     }
@@ -103,7 +97,6 @@ export class PrismaUserRepository implements UserRepository {
         username: true,
         email: true,
         role: true,
-        estado: true,
         rank: true,
         wins: true,
         losses: true,
@@ -132,10 +125,6 @@ export class PrismaUserRepository implements UserRepository {
       ];
     }
 
-    if (filters.estado) {
-      where.estado = filters.estado;
-    }
-
     if (filters.role) {
       where.role = filters.role;
     }
@@ -146,9 +135,7 @@ export class PrismaUserRepository implements UserRepository {
   }
 
   countByEstado(estado: string) {
-    return prisma.user.count({
-      where: { estado },
-    });
+    return 0;
   }
 
   updateRole(id: string, role: string) {
@@ -167,13 +154,12 @@ export class PrismaUserRepository implements UserRepository {
   updateEstado(id: string, estado: string) {
     return prisma.user.update({
       where: { id },
-      data: { estado },
+      data: {},
       select: {
         id: true,
         username: true,
         email: true,
         role: true,
-        estado: true,
         rank: true,
         wins: true,
         losses: true,

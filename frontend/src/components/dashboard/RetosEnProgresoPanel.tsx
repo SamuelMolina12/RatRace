@@ -106,22 +106,49 @@ export default function RetosEnProgresoPanel({
               )}
             </div>
 
-            <div className="challenge-actions">
-              <button
-                className="challenge-btn challenge-btn--win"
-                onClick={() => handleWin(challenge)}
-                disabled={loading === challenge.id}
-              >
-                🏆 Gané
-              </button>
-              <button
-                className="challenge-btn challenge-btn--lose"
-                onClick={() => handleLose(challenge)}
-                disabled={loading === challenge.id}
-              >
-                💀 Perdí
-              </button>
-            </div>
+            {(() => {
+              const isChallenger = challenge.challengerId === user?.id;
+              const myClaim = isChallenger ? challenge.challengerClaim : challenge.challengedClaim;
+              const hasClaimed = myClaim !== null && myClaim !== undefined && myClaim !== "";
+
+              if (hasClaimed) {
+                return (
+                  <div className="challenge-waiting" style={{ 
+                    textAlign: "center", 
+                    padding: "8px", 
+                    fontSize: "0.8rem", 
+                    color: "#ff6b35",
+                    background: "rgba(255, 107, 53, 0.05)",
+                    border: "1px dashed rgba(255, 107, 53, 0.3)",
+                    borderRadius: "6px",
+                    width: "100%",
+                    fontWeight: 500,
+                    marginTop: "8px"
+                  }}>
+                    ⏳ Reclamaste {myClaim === user?.id ? "victoria" : "derrota"}. Esperando al rival...
+                  </div>
+                );
+              }
+
+              return (
+                <div className="challenge-actions">
+                  <button
+                    className="challenge-btn challenge-btn--win"
+                    onClick={() => handleWin(challenge)}
+                    disabled={loading === challenge.id}
+                  >
+                    🏆 Gané
+                  </button>
+                  <button
+                    className="challenge-btn challenge-btn--lose"
+                    onClick={() => handleLose(challenge)}
+                    disabled={loading === challenge.id}
+                  >
+                    💀 Perdí
+                  </button>
+                </div>
+              );
+            })()}
           </div>
         ))}
       </div>

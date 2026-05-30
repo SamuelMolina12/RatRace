@@ -17,6 +17,8 @@ export class ChallengeMapper {
                 : null,
             status: challenge.status,
             winnerId: challenge.winnerId,
+            challengerClaim: challenge.challengerClaim,
+            challengedClaim: challenge.challengedClaim,
             agreedLocation: challenge.agreedLocation,
             agreedDate: challenge.agreedDate,
             notes: challenge.notes,

@@ -66,6 +66,8 @@ export interface Challenge {
   challengedVehicleName?: string;
   status: ChallengeStatus;
   winnerId: string | null;
+  challengerClaim: string | null;
+  challengedClaim: string | null;
   agreedLocation: string | null;
   agreedDate: string | null;
   notes: string | null;
