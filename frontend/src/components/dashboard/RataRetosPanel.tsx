@@ -181,6 +181,20 @@ export default function RataRetosPanel({
               )}
             </div>
 
+            {challenge.status === "disputed" && (
+              <div style={{
+                fontSize: "0.75rem",
+                color: "#ef4444",
+                marginTop: "8px",
+                background: "rgba(239, 68, 68, 0.05)",
+                border: "1px solid rgba(239, 68, 68, 0.2)",
+                borderRadius: "4px",
+                padding: "6px 8px"
+              }}>
+                ⚠️ Desacuerdo: El retador reclamó ganador a <strong>{challenge.challengerClaim === challenge.challengerId ? challenge.challengerName : challenge.challengedName}</strong> y el retado a <strong>{challenge.challengedClaim === challenge.challengedId ? challenge.challengedName : challenge.challengerName}</strong>. Un administrador deberá resolverlo.
+              </div>
+            )}
+
             {renderActions(challenge)}
           </div>
         ))}
